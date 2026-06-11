@@ -41,8 +41,39 @@ Full Dashboard Control
 🧩 Modules
 
 🔐 Authentication System
+
 📅 Event Management
+
 🎟️ Booking System
+
 ⏰ Reminder System
+
 ⚙️ Admin Panel
+
+🛠️ Tech Stack
+
+Technology	Description
+
+Frontend	HTML, CSS, Bootstrap
+
+Backend	Django (Python)
+
+Database	SQLite
+
+Tools	VS Code
+
+🔄 System Workflow
+
+User → Register/Login → Browse Events → Book Event → Receive Reminder
+
+📂 Project Structure
+
+Eventrix/
+│── accounts/        # User authentication
+│── events/          # Event management
+│── reminders/       # Reminder system
+│── templates/       # HTML files
+│── static/          # CSS, JS, Images
+│── db.sqlite3       # Database
+│── manage.py
 
