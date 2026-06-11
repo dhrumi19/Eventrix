@@ -69,11 +69,71 @@ User → Register/Login → Browse Events → Book Event → Receive Reminder
 📂 Project Structure
 
 Eventrix/
+
 │── accounts/        # User authentication
+
 │── events/          # Event management
+
 │── reminders/       # Reminder system
+
 │── templates/       # HTML files
+
 │── static/          # CSS, JS, Images
+
 │── db.sqlite3       # Database
+
 │── manage.py
 
+🚀 Installation & Setup
+
+# Navigate to project folder
+
+cd eventrix
+
+# Create virtual environment
+
+python -m venv venv
+
+# Activate virtual environment
+
+venv\Scripts\activate   # Windows
+
+# Install dependencies
+
+pip install -r requirements.txt
+
+# Run migrations
+
+python manage.py migrate
+
+# Run server
+
+python manage.py runserver
+
+🔮 Future Enhancements
+
+💳 Payment Gateway Integration
+
+📱 Mobile Application
+
+🔔 Real-time Notifications
+
+📊 Analytics Dashboard
+
+📚 Learning Outcomes
+
+Practical implementation of Django framework
+
+Database design & relationships
+
+User authentication system
+
+Full-stack web development experience
+
+🙋‍♀️ Author
+
+Dhrumi Shah
+
+🎓 M.Sc IT Student
+
+💻 Passionate about Web Development & Data Analysis
