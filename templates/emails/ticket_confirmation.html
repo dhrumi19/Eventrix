@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Ticket Confirmation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f1f2f6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f1f2f6;
+            padding: 40px 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .header {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            padding: 30px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .content {
+            padding: 30px;
+            color: #2f3542;
+            line-height: 1.6;
+        }
+        .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .intro {
+            font-size: 15px;
+            color: #57606f;
+            margin-bottom: 25px;
+        }
+        .ticket-card {
+            border: 1px solid #e8ecf0;
+            border-left: 4px solid #6c5ce7;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .ticket-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2f3542;
+            margin: 0 0 15px 0;
+        }
+        .info-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #a4b0be;
+            padding-bottom: 4px;
+        }
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2f3542;
+            padding-bottom: 15px;
+        }
+        .ticket-code-badge {
+            display: inline-block;
+            background-color: #e8dbfc;
+            color: #6c5ce7;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .attachment-note {
+            font-size: 13px;
+            color: #747d8c;
+            background-color: #f1f2f6;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            margin-top: 10px;
+            border: 1px dashed #ced6e0;
+        }
+        .footer {
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #a4b0be;
+            background-color: #f8f9fa;
+            border-top: 1px solid #f1f2f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Booking Confirmed!</h1>
+            </div>
+            <div class="content">
+                <p class="greeting">Hi {{ user.first_name|default:user.username }},</p>
+                <p class="intro">Your booking for <strong>{{ event.title }}</strong> is confirmed! Below are your booking and ticket details.</p>
+                
+                <div class="ticket-card">
+                    <h2 class="ticket-title">{{ event.title }}</h2>
+                    <table class="info-grid">
+                        <tr>
+                            <td width="50%">
+                                <div class="info-label">Date & Time</div>
+                                <div class="info-value">{{ event.date_time|date:"d F Y, P" }}</div>
+                            </td>
+                            <td width="50%">
+                                <div class="info-label">Venue</div>
+                                <div class="info-value">{{ event.venue }}, {{ event.city }}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="info-label">Seats Booked</div>
+                                <div class="info-value">{{ seat_labels }}</div>
+                            </td>
+                            <td>
+                                <div class="info-label">Amount Paid</div>
+                                <div class="info-value">INR {{ booking.total_amount }}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="info-label">Booking Reference</div>
+                                <div class="info-value">#{{ booking.id }}</div>
+                            </td>
+                            <td>
+                                <div class="info-label">Ticket Verification Code</div>
+                                <div class="info-value">
+                                    <span class="ticket-code-badge">{{ ticket.ticket_code }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="attachment-note">
+                    <strong>Note:</strong> We have attached your official entry ticket PDF to this email. You can print it out or show the QR code on your mobile device at the entrance.
+                </div>
+            </div>
+            <div class="footer">
+                <p>This is an automated email from Eventrix. Please do not reply directly to this message.</p>
+                <p>&copy; {% now "Y" %} Eventrix. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

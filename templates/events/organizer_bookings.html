@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Bookings - {{ event.title }} | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card card-glass p-4 p-md-5 animate-fade-in">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom border-glass pb-3">
+            <div>
+                <a href="{% url 'dashboard' %}" class="btn btn-glass btn-sm mb-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
+                <h2 class="fw-bold mb-0">Booking List</h2>
+                <p class="text-muted small">Manage participants and tickets for: <b>{{ event.title }}</b></p>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <a href="{% url 'export_participants' event.id 'excel' %}" class="btn btn-success"><i class="bi bi-file-earmark-excel me-1"></i> Export Excel</a>
+                <a href="{% url 'export_participants' event.id 'csv' %}" class="btn btn-outline-light"><i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV</a>
+            </div>
+        </div>
+        
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle border border-glass" style="border-radius: 12px; overflow: hidden;">
+                    <thead>
+                        <tr class="border-glass">
+                            <th scope="col" class="border-glass">Booking ID</th>
+                            <th scope="col" class="border-glass">User Name</th>
+                            <th scope="col" class="border-glass">Email & Phone</th>
+                            <th scope="col" class="border-glass">Booked Seats</th>
+                            <th scope="col" class="border-glass">Amount Paid</th>
+                            <th scope="col" class="border-glass">Payment Status</th>
+                            <th scope="col" class="border-glass">Booking Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr class="border-glass">
+                                <td class="border-glass">#{{ booking.id }}</td>
+                                <td class="border-glass">
+                                    <span class="fw-bold text-white">{{ booking.user.first_name }} {{ booking.user.last_name }}</span>
+                                    <br><small class="text-muted">@{{ booking.user.username }}</small>
+                                </td>
+                                <td class="border-glass">
+                                    <small class="text-light">{{ booking.user.email }}</small>
+                                    <br><small class="text-muted">{{ booking.user.phone|default:"Phone: N/A" }}</small>
+                                </td>
+                                <td class="border-glass">
+                                    {% for seat in booking.seats.all %}
+                                        <span class="badge bg-secondary me-1">{{ seat.row_label }}{{ seat.seat_number }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td class="border-glass text-success fw-bold">₹{{ booking.total_amount }}</td>
+                                <td class="border-glass">
+                                    {% if booking.payment_status == 'COMPLETED' %}
+                                        <span class="badge bg-success">Success</span>
+                                    {% elif booking.payment_status == 'PENDING' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Failed</span>
+                                    {% endif %}
+                                </td>
+                                <td class="border-glass text-muted small">{{ booking.booking_date|date:"d M Y, h:i A" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-person-x text-muted fs-1 mb-3"></i>
+                <h5 class="fw-bold text-white">No Bookings Found</h5>
+                <p class="text-muted">No tickets have been booked for this event yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

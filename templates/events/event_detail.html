@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}{{ event.title }} | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-primary-light text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item text-muted active" aria-current="page">{{ event.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Event Details Column (Left) -->
+        <div class="col-lg-8">
+            <div class="card card-glass p-0 overflow-hidden mb-4">
+                <!-- Banner Frame -->
+                <div class="position-relative" style="height: 380px;">
+                    {% if event.banner %}
+                        <img src="{{ event.banner.url }}" class="w-100 h-100" style="object-fit: cover;" alt="Event Banner">
+                    {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: {% if event.category == 'MUSIC' %}linear-gradient(135deg, #6c5ce7 0%, #311b92 100%){% elif event.category == 'COMEDY' %}linear-gradient(135deg, #fd79a8 0%, #880e4f 100%){% elif event.category == 'SPORTS' %}linear-gradient(135deg, #00b894 0%, #006064 100%){% elif event.category == 'CONFERENCE' %}linear-gradient(135deg, #0984e3 0%, #0d47a1 100%){% else %}linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%){% endif %};">
+                            <i class="bi {% if event.category == 'MUSIC' %}bi-music-note-beamed{% elif event.category == 'COMEDY' %}bi-emoji-laughing{% elif event.category == 'SPORTS' %}bi-trophy-fill{% elif event.category == 'CONFERENCE' %}bi-laptop-fill{% else %}bi-calendar3{% endif %} text-white-50" style="font-size: 6rem;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-4 p-md-5">
+                    <span class="badge bg-primary mb-3">{{ event.get_category_display }}</span>
+                    <h2 class="fw-bold text-white mb-4">{{ event.title }}</h2>
+                    
+                    <h5 class="fw-bold text-white mb-3">About the Event</h5>
+                    <p class="text-muted leading-relaxed" style="white-space: pre-line; font-size: 1.05rem;">{{ event.description }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Panel (Right) -->
+        <div class="col-lg-4">
+            <div class="card card-glass p-4 sticky-top" style="top: 100px; z-index: 10;">
+                <h5 class="fw-bold mb-4 border-bottom border-glass pb-2">Ticket Summary</h5>
+                
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-calendar-check text-primary fs-4"></i>
+                        <div>
+                            <small class="text-muted d-block">Date & Time</small>
+                            <span class="fw-bold text-white">{{ event.date_time|date:"d M Y" }}</span>
+                            <br><small class="text-light">{{ event.date_time|date:"h:i A" }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-geo-alt-fill text-accent fs-4"></i>
+                        <div>
+                            <small class="text-muted d-block">Venue</small>
+                            <span class="fw-bold text-white">{{ event.venue }}</span>
+                            <br><small class="text-light">{{ event.city }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-person-badge-fill text-info fs-4"></i>
+                        <div>
+                            <small class="text-muted d-block">Organizer</small>
+                            <span class="fw-bold text-white">@{{ event.organizer.username }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-ticket-perforated-fill text-success fs-4"></i>
+                        <div>
+                            <small class="text-muted d-block">Availability</small>
+                            {% if available_seats_count > 0 %}
+                                <span class="fw-bold text-success">{{ available_seats_count }} seats left</span>
+                                <br><small class="text-muted">out of {{ event.capacity }} capacity</small>
+                            {% else %}
+                                <span class="fw-bold text-danger">Sold Out</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="border-glass my-3">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <small class="text-muted d-block">Price per Seat</small>
+                        <span class="fs-3 fw-bold text-success">₹{{ event.ticket_price }}</span>
+                    </div>
+                </div>
+                
+                {% if available_seats_count > 0 %}
+                    <a href="{% url 'select_seats' event.id %}" class="btn btn-grad-primary w-100 py-3 text-uppercase fw-bold"><i class="bi bi-grid-3x3-gap me-2"></i>Select Seats</a>
+                {% else %}
+                    <button class="btn btn-glass w-100 py-3 text-uppercase fw-bold text-muted" disabled>Sold Out</button>
+                {% endif %}
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted"><i class="bi bi-shield-fill-check me-1"></i> Safe & Secure Transactions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

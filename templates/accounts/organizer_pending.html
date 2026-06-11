@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Account Pending Approval | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-md-7 text-center">
+            <div class="card card-glass p-5 animate-fade-in">
+                <i class="bi bi-clock-history text-warning fs-1 mb-4 d-block"></i>
+                <h2 class="fw-bold mb-3 text-warning">Approval Pending</h2>
+                <p class="text-muted fs-5 mb-4">Your Organizer account is registered, but requires administrative approval before you can publish events, manage seat layouts, and track revenues.</p>
+                <div class="border-top border-glass pt-4 mb-4">
+                    <p class="text-muted small">We will review your account application within 24 hours. Once approved, logging in will automatically grant access to the organizer analytics dashboard and tools.</p>
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'home' %}" class="btn btn-glass">Go to Home</a>
+                    <a href="{% url 'logout' %}" class="btn btn-grad-primary">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

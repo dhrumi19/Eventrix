@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Complete Payment | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-md-7 col-lg-6">
+            <div class="card card-glass p-4 p-md-5 animate-fade-in">
+                <div class="text-center mb-4">
+                    <i class="bi bi-credit-card-2-back-fill text-success fs-1 mb-2 d-inline-block"></i>
+                    <h2 class="fw-bold text-white">Payment Checkout</h2>
+                    <p class="text-muted">Review booking details and complete your ticket payment</p>
+                </div>
+                
+                <!-- Booking details summary -->
+                <div class="p-4 border border-glass rounded-4 mb-4" style="background: rgba(255,255,255,0.02)">
+                    <h5 class="fw-bold text-white mb-3">{{ booking.event.title }}</h5>
+                    
+                    <div class="row g-2 text-start small">
+                        <div class="col-6">
+                            <span class="text-muted d-block">Venue:</span>
+                            <span class="text-light">{{ booking.event.venue }}, {{ booking.event.city }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">Date & Time:</span>
+                            <span class="text-light">{{ booking.event.date_time|date:"d M Y, h:i A" }}</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Selected Seats:</span>
+                            <span class="text-light">
+                                {% for seat in booking.seats.all %}
+                                    {{ seat.row_label }}{{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Booking Reference:</span>
+                            <span class="text-light">#{{ booking.id }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+                    <span class="text-muted fs-5">Total Amount Due</span>
+                    <span class="fs-2 fw-bold text-success">₹{{ booking.total_amount }}</span>
+                </div>
+                
+                {% if is_simulation %}
+                    <!-- SIMULATION MODE CHECKOUT -->
+                    <div class="alert alert-info border-glass bg-opacity-5 backdrop-blur rounded-4 py-3 mb-4 text-start" style="background: rgba(108, 92, 231, 0.05); border-color: rgba(108, 92, 231, 0.25) !important;">
+                        <div class="d-flex gap-3 align-items-center">
+                            <i class="bi bi-shield-check fs-4 text-primary-light"></i>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1" style="font-size:0.9rem;">Secure Sandbox Checkout</h6>
+                                <p class="text-muted small mb-0" style="font-size:0.75rem;">This is a test environment checkout. You can finalize this booking instantly or cancel the reservation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <form action="{% url 'payment_callback' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                                <input type="hidden" name="status" value="success">
+                                <button type="submit" class="btn btn-grad-primary w-100 py-3 fw-bold"><i class="bi bi-check-circle me-1"></i> Confirm Payment</button>
+                            </form>
+                        </div>
+                        <div class="col-sm-6">
+                            <form action="{% url 'payment_callback' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                                <input type="hidden" name="status" value="failed">
+                                <button type="submit" class="btn btn-glass w-100 py-3 fw-bold text-danger"><i class="bi bi-x-circle me-1"></i> Cancel Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- REAL RAZORPAY GATEWAY CHECKOUT -->
+                    <button id="rzp-button" class="btn btn-grad-primary w-100 py-3 text-uppercase fw-bold"><i class="bi bi-wallet2 me-2"></i> Pay with Razorpay</button>
+                    
+                    <form id="payment-success-form" action="{% url 'payment_callback' %}" method="POST" style="display: none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                        <input type="hidden" name="status" value="success">
+                        <input type="hidden" id="rzp_payment_id" name="razorpay_payment_id">
+                        <input type="hidden" id="rzp_order_id" name="razorpay_order_id">
+                        <input type="hidden" id="rzp_signature" name="razorpay_signature">
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if not is_simulation %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ total_amount_paise }}",
+        "currency": "INR",
+        "name": "Eventrix",
+        "description": "Ticket Booking for {{ booking.event.title }}",
+        "image": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/icons/grid-3x3-gap-fill.svg",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response){
+            document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('rzp_order_id').value = response.razorpay_order_id;
+            document.getElementById('rzp_signature').value = response.razorpay_signature;
+            document.getElementById('payment-success-form').submit();
+        },
+        "prefill": {
+            "name": "{{ request.user.first_name }} {{ request.user.last_name }}",
+            "email": "{{ request.user.email }}",
+            "contact": "{{ request.user.phone|default:'' }}"
+        },
+        "theme": {
+            "color": "#6c5ce7"
+        }
+    };
+    const rzp = new Razorpay(options);
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    }
+</script>
+{% endif %}
+{% endblock %}

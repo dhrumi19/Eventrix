@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block title %}Select Seats | {{ event.title }} | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Main Layout Area (Left) -->
+        <div class="col-lg-8">
+            <div class="card card-glass p-4 text-center">
+                <div class="d-flex justify-content-between align-items-center mb-4 text-start">
+                    <div>
+                        <a href="{% url 'event_detail' event.id %}" class="btn btn-glass btn-sm mb-2"><i class="bi bi-arrow-left"></i> Back</a>
+                        <h3 class="fw-bold mb-0">Select Your Seats</h3>
+                        <p class="text-muted small">Choose your seats from the layout below</p>
+                    </div>
+                </div>
+                
+                <!-- Screen/Stage Graphic -->
+                <div class="w-75 mx-auto py-2 mb-5 rounded-pill border-top border-4 border-primary text-muted small shadow-sm" style="background: rgba(108, 92, 231, 0.05);">
+                    STAGE / SCREEN THIS WAY
+                </div>
+                
+                <!-- Seat Layout Grid -->
+                <form id="seatsForm" method="POST">
+                    {% csrf_token %}
+                    <!-- Hidden inputs to hold selected seat values -->
+                    <div id="hiddenSeatsContainer"></div>
+                    
+                    <div class="seat-grid-container overflow-auto py-3">
+                        <div class="d-inline-block text-start" style="min-width: 100%;">
+                            {% for row_label, seat_list in grouped_seats.items %}
+                                <div class="d-flex align-items-center justify-content-center mb-2 gap-2">
+                                    <!-- Row label -->
+                                    <span class="text-muted fw-bold me-3" style="width: 20px;">{{ row_label }}</span>
+                                    
+                                    {% for seat in seat_list %}
+                                        <div class="seat-item {% if seat.status == 'AVAILABLE' %}available{% elif seat.status == 'BOOKED' %}booked{% else %}blocked{% endif %}" 
+                                             data-id="{{ seat.id }}" 
+                                             data-label="{{ row_label }}{{ seat.seat_number }}"
+                                             {% if seat.status != 'AVAILABLE' %}style="pointer-events: none;"{% endif %}>
+                                            {{ seat.seat_number }}
+                                        </div>
+                                    {% endfor %}
+                                    
+                                    <!-- Row label end -->
+                                    <span class="text-muted fw-bold ms-3" style="width: 20px;">{{ row_label }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Summary & Confirmation Sidebar (Right) -->
+        <div class="col-lg-4">
+            <div class="card card-glass p-4 sticky-top" style="top: 100px; z-index: 10;">
+                <h5 class="fw-bold mb-4 border-bottom border-glass pb-2">Seating Details</h5>
+                
+                <!-- Seating Color Legend -->
+                <div class="d-flex justify-content-between mb-4 flex-wrap gap-2 text-start">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="seat-item available" style="width: 20px; height: 20px; font-size: 0.6rem; pointer-events: none;"></span>
+                        <span class="text-muted small">Available</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="seat-item selected" style="width: 20px; height: 20px; font-size: 0.6rem; pointer-events: none;"></span>
+                        <span class="text-muted small">Selected</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="seat-item booked" style="width: 20px; height: 20px; font-size: 0.6rem; pointer-events: none;"></span>
+                        <span class="text-muted small">Booked</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="seat-item blocked" style="width: 20px; height: 20px; font-size: 0.6rem; pointer-events: none;"></span>
+                        <span class="text-muted small">Blocked</span>
+                    </div>
+                </div>
+                
+                <hr class="border-glass my-3">
+                
+                <!-- Price and details calculations -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Selected Seats:</span>
+                        <span id="selectedSeatsList" class="fw-bold text-white">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Unit Price:</span>
+                        <span class="fw-bold text-white">₹{{ event.ticket_price }}</span>
+                    </div>
+                </div>
+                
+                <hr class="border-glass my-3">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <span class="text-muted d-block">Total Cost</span>
+                        <span class="fs-3 fw-bold text-success">₹<span id="totalAmount">0.00</span></span>
+                    </div>
+                </div>
+                
+                <button type="button" id="confirmBookingBtn" class="btn btn-grad-primary w-100 py-3 text-uppercase fw-bold" disabled>Confirm Seats</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const seats = document.querySelectorAll(".seat-item.available");
+        const selectedSeatsList = document.getElementById("selectedSeatsList");
+        const totalAmountSpan = document.getElementById("totalAmount");
+        const confirmBookingBtn = document.getElementById("confirmBookingBtn");
+        const hiddenSeatsContainer = document.getElementById("hiddenSeatsContainer");
+        const seatsForm = document.getElementById("seatsForm");
+        
+        const ticketPrice = parseFloat("{{ event.ticket_price }}");
+        let selectedSeats = [];
+        
+        seats.forEach(seat => {
+            seat.addEventListener("click", function () {
+                const seatId = this.getAttribute("data-id");
+                const seatLabel = this.getAttribute("data-label");
+                
+                if (this.classList.contains("selected")) {
+                    // Deselect
+                    this.classList.remove("selected");
+                    selectedSeats = selectedSeats.filter(s => s.id !== seatId);
+                } else {
+                    // Select
+                    this.classList.add("selected");
+                    selectedSeats.push({ id: seatId, label: seatLabel });
+                }
+                
+                updateSummary();
+            });
+        });
+        
+        function updateSummary() {
+            if (selectedSeats.length > 0) {
+                // Generate comma separated string of seat labels
+                const labels = selectedSeats.map(s => s.label).join(", ");
+                selectedSeatsList.textContent = labels;
+                
+                // Calculate and update amount
+                const total = selectedSeats.length * ticketPrice;
+                totalAmountSpan.textContent = total.toFixed(2);
+                
+                // Enable booking button
+                confirmBookingBtn.removeAttribute("disabled");
+            } else {
+                selectedSeatsList.textContent = "-";
+                totalAmountSpan.textContent = "0.00";
+                confirmBookingBtn.setAttribute("disabled", "true");
+            }
+        }
+        
+        confirmBookingBtn.addEventListener("click", function () {
+            // Empty existing hidden inputs
+            hiddenSeatsContainer.innerHTML = "";
+            
+            // Append inputs for selected seat IDs
+            selectedSeats.forEach(seat => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "selected_seats";
+                input.value = seat.id;
+                hiddenSeatsContainer.appendChild(input);
+            });
+            
+            // Submit form
+            seatsForm.submit();
+        });
+    });
+</script>
+{% endblock %}

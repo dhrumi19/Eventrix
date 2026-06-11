@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Manage Profile | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card card-glass p-3 h-100">
+                <div class="text-center py-3 border-bottom border-glass mb-3">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle mb-3 border border-2 border-primary" style="width: 90px; height: 90px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3" style="width: 90px; height: 90px;">
+                            <i class="bi bi-person-fill text-white fs-1"></i>
+                        </div>
+                    {% endif %}
+                    <h5 class="fw-bold mb-1">{{ user.username }}</h5>
+                    <p class="text-muted small mb-0">{{ user.email }}</p>
+                    <span class="badge badge-role mt-2 {% if user.is_admin_role %}badge-admin{% elif user.is_organizer_role %}badge-organizer{% else %}badge-customer{% endif %}">
+                        {{ user.get_role_display }}
+                    </span>
+                </div>
+                
+                <div class="nav flex-column nav-pills gap-2">
+                    <a href="{% url 'dashboard' %}" class="nav-link text-white d-flex align-items-center gap-2">
+                        <i class="bi bi-grid"></i> Dashboard
+                    </a>
+                    <a href="{% url 'profile' %}" class="nav-link active d-flex align-items-center gap-2">
+                        <i class="bi bi-person-gear"></i> Update Profile
+                    </a>
+                    <a href="{% url 'change_password' %}" class="nav-link text-white d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-lock"></i> Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Form Content -->
+        <div class="col-md-8 col-lg-9">
+            <div class="card card-glass p-4 p-md-5">
+                <h3 class="fw-bold mb-4">Edit Profile</h3>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label for="id_first_name" class="form-label text-muted small">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="id_last_name" class="form-label text-muted small">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="id_email" class="form-label text-muted small">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <label for="id_phone" class="form-label text-muted small">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="id_city" class="form-label text-muted small">City</label>
+                            {{ form.city }}
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="id_profile_picture" class="form-label text-muted small">Profile Picture</label>
+                            {{ form.profile_picture }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top border-glass d-flex justify-content-end gap-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-glass">Cancel</a>
+                        <button type="submit" class="btn btn-grad-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

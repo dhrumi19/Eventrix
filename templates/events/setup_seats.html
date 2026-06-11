@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Setup Seat Layout | {{ event.title }} | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-glass p-4 p-md-5 animate-fade-in">
+                <div class="mb-4">
+                    <a href="{% url 'dashboard' %}" class="btn btn-glass btn-sm mb-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
+                    <h2 class="fw-bold mb-0">Create Seat Layout</h2>
+                    <p class="text-muted small">Configure seat matrix size for: <b>{{ event.title }}</b></p>
+                </div>
+                
+                {% if booked_count > 0 %}
+                    <div class="alert alert-danger border-danger bg-opacity-10 backdrop-blur rounded-4 py-3 mb-4 text-start">
+                        <div class="d-flex gap-2">
+                            <i class="bi bi-exclamation-octagon-fill fs-4 text-danger"></i>
+                            <div>
+                                <h6 class="fw-bold text-danger mb-1">Layout Configurations Locked</h6>
+                                <p class="text-muted small mb-0">You cannot edit the seating layout because <b>{{ booked_count }} seats</b> have already been booked by customers. Changing the layout now would compromise ticket mappings.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info border-info bg-opacity-10 backdrop-blur rounded-4 py-3 mb-4 text-start">
+                        <div class="d-flex gap-2">
+                            <i class="bi bi-info-circle-fill fs-4 text-info"></i>
+                            <div>
+                                <h6 class="fw-bold text-info mb-1">Warning: Grid Regeneration</h6>
+                                <p class="text-muted small mb-0">Submitting this form deletes all existing seats for this event and seeds a fresh grid. Double-check your numbers before submitting.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="rows_count" class="form-label text-muted small">Number of Rows (Rows A, B, C...)</label>
+                        <input type="number" name="rows_count" id="rows_count" class="form-control form-control-glass" value="{{ current_rows_count }}" min="1" max="20" required {% if booked_count > 0 %}disabled{% endif %}>
+                        <div class="form-text text-muted small">Enter a number between 1 and 20 (e.g. 5 represents rows A to E).</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="cols_count" class="form-label text-muted small">Seats per Row</label>
+                        <input type="number" name="cols_count" id="cols_count" class="form-control form-control-glass" value="{{ current_cols_count }}" min="1" max="30" required {% if booked_count > 0 %}disabled{% endif %}>
+                        <div class="form-text text-muted small">Enter a number between 1 and 30 (e.g. 10 represents 10 seats per row).</div>
+                    </div>
+                    
+                    <div class="pt-3 border-top border-glass d-flex justify-content-end gap-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-glass">Cancel</a>
+                        <button type="submit" class="btn btn-grad-primary" {% if booked_count > 0 %}disabled{% endif %}>Generate Layout</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Live Layout Preview panel -->
+        <div class="col-lg-6">
+            <div class="card card-glass p-4 text-center">
+                <h5 class="fw-bold text-white mb-4 text-start"><i class="bi bi-eye me-2 text-primary-light"></i>Current Layout Preview</h5>
+                
+                {% if seats %}
+                    <p class="text-muted small text-start">The event currently has <b>{{ seats.count }}</b> seats allocated. Here is a mini layout overview:</p>
+                    <div class="p-3 border border-glass rounded-4 bg-opacity-25" style="background: rgba(0,0,0,0.2); max-height: 350px; overflow-y: auto;">
+                        <div class="d-flex flex-wrap gap-1 justify-content-center">
+                            {% for seat in seats %}
+                                <span class="badge {% if seat.status == 'BOOKED' %}bg-secondary{% elif seat.status == 'BLOCKED' %}bg-danger{% else %}bg-success bg-opacity-75{% endif %} rounded" style="font-size:0.65rem; width: 28px; padding: 4px 0;" title="{{ seat.row_label }}{{ seat.seat_number }} ({{ seat.status }})">
+                                    {{ seat.row_label }}{{ seat.seat_number }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-grid-3x3 text-muted fs-1 mb-2 d-block"></i>
+                        <p class="text-muted mb-0">No layout generated for this event yet. Use the configuration form on the left to initialize.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

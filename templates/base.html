@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Eventrix - Industry-level Event Management & Ticket Booking System. Discover events, select seats, book tickets, and manage bookings effortlessly.">
+    <title>{% block title %}Eventrix | Premium Event Booking & Management{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/style.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Corrected Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-glass sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                <i class="bi bi-grid-3x3-gap-fill text-primary-light"></i>
+                <span>EVENTRIX</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Explore Events</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-glass dropdown-toggle d-flex align-items-center gap-2" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                                {% else %}
+                                    <i class="bi bi-person-circle"></i>
+                                {% endif %}
+                                <span>{{ user.username }}</span>
+                                {% if user.is_admin_role %}
+                                    <span class="badge badge-role badge-admin ms-1">Admin</span>
+                                {% elif user.is_organizer_role %}
+                                    <span class="badge badge-role badge-organizer ms-1">Organizer</span>
+                                {% else %}
+                                    <span class="badge badge-role badge-customer ms-1">Customer</span>
+                                {% endif %}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end border-glass shadow-lg mt-2" aria-labelledby="userDropdown" style="background: rgba(15, 12, 32, 0.95); border-radius: 12px;">
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
+                                        <i class="bi bi-speedometer2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'profile' %}">
+                                        <i class="bi bi-gear"></i> Manage Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider border-glass"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger" href="{% url 'logout' %}">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-glass">Login</a>
+                        <a href="{% url 'register' %}" class="btn btn-grad-primary">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show border-glass bg-opacity-75 backdrop-blur shadow-lg animate-fade-in" role="alert" style="border-radius: 12px;">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill text-info fs-5"></i>
+                        {% endif %}
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-5 text-center text-md-start">
+        <div class="container">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <a class="navbar-brand d-inline-flex align-items-center gap-2 mb-3" href="{% url 'home' %}">
+                        <i class="bi bi-grid-3x3-gap-fill text-primary-light"></i>
+                        <span>EVENTRIX</span>
+                    </a>
+                    <p class="text-muted mb-0">Experience the next generation of seamless event booking, interactive live seating, and secure instant ticketing. Powered by Django & Razorpay.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex justify-content-center justify-content-md-end gap-3 mb-3">
+                        <a href="#" class="btn btn-glass btn-sm rounded-circle" style="width: 38px; height: 38px; padding: 6px;"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="btn btn-glass btn-sm rounded-circle" style="width: 38px; height: 38px; padding: 6px;"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="btn btn-glass btn-sm rounded-circle" style="width: 38px; height: 38px; padding: 6px;"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="btn btn-glass btn-sm rounded-circle" style="width: 38px; height: 38px; padding: 6px;"><i class="bi bi-github"></i></a>
+                    </div>
+                    <p class="text-muted small mb-0">&copy; 2026 Eventrix. All Rights Reserved. Made for modern event spaces.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

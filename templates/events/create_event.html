@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Create Event | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-glass p-4 p-md-5 animate-fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <a href="{% url 'dashboard' %}" class="btn btn-glass btn-sm mb-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
+                        <h2 class="fw-bold mb-0">Create New Event</h2>
+                        <p class="text-muted small">Submit event details for verification and publishing</p>
+                    </div>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data" class="needs-validation">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="id_title" class="form-label text-muted small">Event Title</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="id_category" class="form-label text-muted small">Category</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="id_city" class="form-label text-muted small">City</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="id_venue" class="form-label text-muted small">Venue Address</label>
+                            {{ form.venue }}
+                            {% if form.venue.errors %}
+                                <div class="text-danger small mt-1">{{ form.venue.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="id_date_time" class="form-label text-muted small">Date & Time</label>
+                            {{ form.date_time }}
+                            {% if form.date_time.errors %}
+                                <div class="text-danger small mt-1">{{ form.date_time.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="id_ticket_price" class="form-label text-muted small">Ticket Price (INR)</label>
+                            {{ form.ticket_price }}
+                            {% if form.ticket_price.errors %}
+                                <div class="text-danger small mt-1">{{ form.ticket_price.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="id_capacity" class="form-label text-muted small">Seating Capacity</label>
+                            {{ form.capacity }}
+                            {% if form.capacity.errors %}
+                                <div class="text-danger small mt-1">{{ form.capacity.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="id_banner" class="form-label text-muted small">Upload Event Banner</label>
+                            {{ form.banner }}
+                            {% if form.banner.errors %}
+                                <div class="text-danger small mt-1">{{ form.banner.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="id_description" class="form-label text-muted small">Event Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <div class="form-check">
+                                {{ form.is_published }}
+                                <label class="form-check-label text-white fw-medium ms-2" for="id_is_published">
+                                    Publish immediately upon admin approval?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top border-glass d-flex justify-content-end gap-3">
+                        <a href="{% url 'dashboard' %}" class="btn btn-glass">Cancel</a>
+                        <button type="submit" class="btn btn-grad-primary">Create Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

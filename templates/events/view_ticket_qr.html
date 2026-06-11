@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Verify Ticket | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-md-7 col-lg-6">
+            <div class="card card-glass p-4 p-md-5 text-center animate-fade-in">
+                <!-- Branding -->
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+                    <i class="bi bi-grid-3x3-gap-fill text-primary-light fs-3"></i>
+                    <h4 class="fw-bold mb-0" style="letter-spacing: 1px;">EVENTRIX PASS</h4>
+                </div>
+                
+                <!-- Ticket QR code rendering -->
+                {% if ticket.qr_code %}
+                    <div class="p-3 bg-white d-inline-block rounded-4 shadow-lg mb-4" style="border: 2px solid var(--primary);">
+                        <img src="{{ ticket.qr_code.url }}" alt="Ticket QR Code" style="width: 220px; height: 220px;">
+                    </div>
+                {% else %}
+                    <div class="p-5 border border-glass rounded-4 mb-4 text-muted small">
+                        <i class="bi bi-qr-code fs-1 d-block mb-2 text-warning"></i>
+                        No QR code generated.
+                    </div>
+                {% endif %}
+                
+                <!-- Ticket specs -->
+                <h4 class="fw-bold text-white mb-2">{{ ticket.booking.event.title }}</h4>
+                <p class="text-muted mb-4 small"><i class="bi bi-geo-alt text-accent"></i> {{ ticket.booking.event.venue }}, {{ ticket.booking.event.city }}</p>
+                
+                <div class="p-3 border border-glass rounded-4 mb-4 text-start" style="background: rgba(255,255,255,0.02)">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase" style="font-size:0.7rem;">Date & Time</small>
+                            <span class="text-light small fw-medium">{{ ticket.booking.event.date_time|date:"d M Y, h:i A" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase" style="font-size:0.7rem;">Booked Seats</small>
+                            <span class="text-light small fw-medium">
+                                {% for seat in ticket.booking.seats.all %}
+                                    <span class="badge bg-secondary me-1">{{ seat.row_label }}{{ seat.seat_number }}</span>
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase" style="font-size:0.7rem;">Customer</small>
+                            <span class="text-light small fw-medium">@{{ ticket.booking.user.username }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block text-uppercase" style="font-size:0.7rem;">Ticket Code</small>
+                            <span class="text-light text-xxs font-monospace" style="font-size: 0.65rem;">{{ ticket.ticket_code }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'dashboard' %}" class="btn btn-glass px-4">My Dashboard</a>
+                    <a href="{% url 'download_ticket_pdf' ticket.ticket_code %}" class="btn btn-grad-primary px-4"><i class="bi bi-file-earmark-pdf me-1"></i> Download PDF</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

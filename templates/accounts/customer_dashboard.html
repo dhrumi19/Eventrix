@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}User Dashboard | Eventrix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Dashboard Sidebar Summary -->
+        <div class="col-lg-3">
+            <div class="card card-glass p-4 text-center">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle mb-3 border border-2 border-primary mx-auto" style="width: 80px; height: 80px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-fill text-white fs-2"></i>
+                    </div>
+                {% endif %}
+                <h5 class="fw-bold mb-1">{{ user.username }}</h5>
+                <p class="text-muted small">{{ user.email }}</p>
+                <div class="d-grid mt-3">
+                    <a href="{% url 'profile' %}" class="btn btn-glass btn-sm"><i class="bi bi-pencil-square"></i> Edit Profile</a>
+                </div>
+                
+                <hr class="border-glass my-4">
+                
+                <!-- Quick stats -->
+                <div class="row text-start g-3">
+                    <div class="col-12">
+                        <div class="p-3 border border-glass rounded-3" style="background: rgba(255,255,255,0.02)">
+                            <small class="text-muted d-block">Upcoming Events</small>
+                            <span class="fs-4 fw-bold">{{ upcoming_bookings.count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-3 border border-glass rounded-3" style="background: rgba(255,255,255,0.02)">
+                            <small class="text-muted d-block">Past Bookings</small>
+                            <span class="fs-4 fw-bold">{{ past_bookings.count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Dashboard Tabs -->
+        <div class="col-lg-9">
+            <div class="card card-glass p-4">
+                <h3 class="fw-bold mb-4">User Dashboard</h3>
+                
+                <ul class="nav nav-tabs border-glass mb-4" id="dashboardTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link text-white active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+                            <i class="bi bi-calendar-event me-2"></i>Upcoming Events
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link text-white" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                            <i class="bi bi-clock-history me-2"></i>Booking History
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link text-white" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">
+                            <i class="bi bi-bell me-2"></i>Notifications 
+                            {% if notifications.count > 0 %}
+                                <span class="badge bg-danger ms-1">{{ notifications.count }}</span>
+                            {% endif %}
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="dashboardTabsContent">
+                    <!-- Upcoming Bookings Tab -->
+                    <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                        {% if upcoming_bookings %}
+                            <div class="row g-3">
+                                {% for booking in upcoming_bookings %}
+                                    <div class="col-md-12">
+                                        <div class="p-4 border border-glass rounded-4" style="background: rgba(255,255,255,0.03);">
+                                            <div class="row align-items-center g-3">
+                                                <div class="col-md-7">
+                                                    <span class="badge bg-primary mb-2">{{ booking.event.get_category_display }}</span>
+                                                    <h5 class="fw-bold mb-1">{{ booking.event.title }}</h5>
+                                                    <p class="text-muted small mb-0">
+                                                        <i class="bi bi-geo-alt me-1"></i> {{ booking.event.venue }}, {{ booking.event.city }} | 
+                                                        <i class="bi bi-calendar-check ms-2 me-1"></i> {{ booking.event.date_time|date:"d M Y, h:i A" }}
+                                                    </p>
+                                                    <p class="text-light small mt-2 mb-0">
+                                                        <strong>Booked Seats:</strong> 
+                                                        {% for seat in booking.seats.all %}
+                                                            <span class="badge bg-secondary me-1">{{ seat.row_label }}{{ seat.seat_number }}</span>
+                                                        {% endfor %}
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-5 text-md-end border-start-md border-glass ps-md-4">
+                                                    <div class="text-muted small mb-1">Booking Ref: #{{ booking.id }}</div>
+                                                    <div class="fs-4 fw-bold text-success mb-3">₹{{ booking.total_amount }}</div>
+                                                    
+                                                    <!-- Actions -->
+                                                    <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                                                        {% if booking.ticket %}
+                                                            <a href="{% url 'view_ticket_qr' booking.ticket.ticket_code %}" class="btn btn-sm btn-glass d-flex align-items-center gap-1" target="_blank">
+                                                                <i class="bi bi-qr-code"></i> View QR
+                                                            </a>
+                                                            <a href="{% url 'download_ticket_pdf' booking.ticket.ticket_code %}" class="btn btn-sm btn-grad-primary d-flex align-items-center gap-1">
+                                                                <i class="bi bi-file-earmark-pdf"></i> PDF Ticket
+                                                            </a>
+                                                        {% else %}
+                                                            <span class="badge bg-warning text-dark">Ticket Generating...</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-ticket-perforated text-muted fs-1 mb-3 d-block"></i>
+                                <p class="text-muted mb-3">No upcoming events booked yet.</p>
+                                <a href="{% url 'home' %}" class="btn btn-grad-primary">Explore Events</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Booking History Tab -->
+                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                        {% if past_bookings %}
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover align-middle border border-glass" style="border-radius: 12px; overflow: hidden;">
+                                    <thead>
+                                        <tr class="border-glass">
+                                            <th scope="col" class="border-glass">Booking ID</th>
+                                            <th scope="col" class="border-glass">Event</th>
+                                            <th scope="col" class="border-glass">Date booked</th>
+                                            <th scope="col" class="border-glass">Amount</th>
+                                            <th scope="col" class="border-glass">Status</th>
+                                            <th scope="col" class="border-glass">Ticket</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for booking in past_bookings %}
+                                            <tr class="border-glass">
+                                                <td class="border-glass">#{{ booking.id }}</td>
+                                                <td class="border-glass">
+                                                    <span class="fw-bold">{{ booking.event.title }}</span>
+                                                    <br><small class="text-muted">{{ booking.event.date_time|date:"d M Y" }}</small>
+                                                </td>
+                                                <td class="border-glass">{{ booking.booking_date|date:"d M Y" }}</td>
+                                                <td class="border-glass">₹{{ booking.total_amount }}</td>
+                                                <td class="border-glass">
+                                                    {% if booking.payment_status == 'COMPLETED' %}
+                                                        <span class="badge bg-success">Success</span>
+                                                    {% elif booking.payment_status == 'PENDING' %}
+                                                        <span class="badge bg-warning text-dark">Pending</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Failed</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="border-glass">
+                                                    {% if booking.payment_status == 'COMPLETED' and booking.ticket %}
+                                                        <a href="{% url 'download_ticket_pdf' booking.ticket.ticket_code %}" class="btn btn-sm btn-glass"><i class="bi bi-download"></i> PDF</a>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-clock-history text-muted fs-1 mb-3 d-block"></i>
+                                <p class="text-muted">No booking history available.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Notifications Tab -->
+                    <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+                        {% if notifications %}
+                            <div class="d-flex flex-column gap-2">
+                                {% for notification in notifications %}
+                                    <div class="p-3 border border-glass rounded-3 d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02);">
+                                        <div>
+                                            <p class="mb-1 text-light">{{ notification.message }}</p>
+                                            <small class="text-muted">{{ notification.created_at|date:"d M Y, h:i A" }}</small>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'read_notification' notification.id %}" class="btn btn-sm btn-glass text-success"><i class="bi bi-check2"></i> Mark Read</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-bell-slash text-muted fs-1 mb-3 d-block"></i>
+                                <p class="text-muted">No unread notifications.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
