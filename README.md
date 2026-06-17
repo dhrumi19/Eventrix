@@ -1,139 +1,98 @@
-🚀 Eventrix – Event Management System
+🎉 Eventrix — Event Management System  
+Python Django SQLite Bootstrap  
 
-A Django-based web application that simplifies event booking and management with automated reminders.
+A full-stack event management web application built with Python and Django. Eventrix allows users to explore, book, and manage events while enabling admins to control the entire system. It also includes an automated reminder system to notify users about upcoming events.
 
-📌 Overview
+🚀 Features  
 
-Eventrix is a full-stack Event Management System built using Django. It provides a seamless platform where users can explore and book events, while administrators can efficiently manage events, users, and bookings.
+User Side  
+🔐 User registration and secure login/logout system  
+📅 Browse and explore available events  
+🎟️ Easy event booking system  
+⏰ Automated reminders for upcoming events  
+📋 View booking details and history  
 
-The system also includes an automated reminder feature to notify users about upcoming events, ensuring better engagement and user experience.
+Admin Side  
+📊 Admin dashboard for monitoring system activity  
+🛠️ Create, update, and delete events  
+👥 Manage users and bookings  
+⚙️ Full system control through Django admin panel  
 
-🎯 Objectives
+🛠️ Tech Stack  
 
-Digitize the event management process
+Layer        Technology  
+Backend      Python 3.x, Django  
+Database     SQLite  
+Frontend     HTML, CSS, Bootstrap  
+Tools        VS Code  
 
-Provide a user-friendly booking system
+📂 Project Structure  
 
-Enable efficient event handling for admins
+eventrix/  
+├── accounts/           # User authentication module  
+├── events/             # Event management module  
+├── reminders/          # Reminder system  
+├── templates/          # HTML templates  
+├── static/             # CSS, JS, images  
+├── db.sqlite3          # Database  
+├── manage.py  
+└── requirements.txt  
 
-Improve user engagement through reminders
+🔄 System Workflow  
 
-✨ Features
+User → Register/Login → Browse Events → Book Event → Receive Reminder  
 
-👤 User Side
+🗄️ Database Models  
 
-User Registration & Login
+Model        Description  
+User         Registered user details  
+Event        Event information (title, date, location, etc.)  
+Booking      Stores booking details of users  
+Reminder     Handles event notification system  
 
-Browse Available Events
+⚙️ Installation  
 
-Book Events Easily
+# 1. Clone the repository  
+git clone https://github.com/your-username/eventrix.git  
+cd eventrix  
 
-Receive Event Reminders
+# 2. Create virtual environment  
+python -m venv venv  
 
-🛠️ Admin Side
+# Activate environment  
+venv\Scripts\activate        # Windows  
+source venv/bin/activate     # macOS/Linux  
 
-Create, Update, Delete Events
+# 3. Install dependencies  
+pip install -r requirements.txt  
 
-Manage Users & Bookings
+# 4. Run migrations  
+python manage.py migrate  
 
-Full Dashboard Control
+# 5. Create superuser  
+python manage.py createsuperuser  
 
-🧩 Modules
+# 6. Run server  
+python manage.py runserver  
 
-🔐 Authentication System
+# Open in browser  
+http://127.0.0.1:8000  
 
-📅 Event Management
+🎯 Future Enhancements  
 
-🎟️ Booking System
+💳 Payment Gateway Integration  
+📱 Mobile App Version  
+🔔 Real-time Notifications  
+📊 Advanced Analytics Dashboard  
 
-⏰ Reminder System
+📚 Learning Outcomes  
 
-⚙️ Admin Panel
+- Hands-on experience with Django framework  
+- Backend and database integration  
+- Authentication system implementation  
+- Real-world full-stack project development  
 
-🛠️ Tech Stack
+👩‍💻 Author  
 
-Technology	Description
-
-Frontend	HTML, CSS, Bootstrap
-
-Backend	Django (Python)
-
-Database	SQLite
-
-Tools	VS Code
-
-🔄 System Workflow
-
-User → Register/Login → Browse Events → Book Event → Receive Reminder
-
-📂 Project Structure
-
-Eventrix/
-
-│── accounts/        # User authentication
-
-│── events/          # Event management
-
-│── reminders/       # Reminder system
-
-│── templates/       # HTML files
-
-│── static/          # CSS, JS, Images
-
-│── db.sqlite3       # Database
-
-│── manage.py
-
-🚀 Installation & Setup
-
-# Navigate to project folder
-
-cd eventrix
-
-# Create virtual environment
-
-python -m venv venv
-
-# Activate virtual environment
-
-venv\Scripts\activate   # Windows
-
-# Install dependencies
-
-pip install -r requirements.txt
-
-# Run migrations
-
-python manage.py migrate
-
-# Run server
-
-python manage.py runserver
-
-🔮 Future Enhancements
-
-💳 Payment Gateway Integration
-
-📱 Mobile Application
-
-🔔 Real-time Notifications
-
-📊 Analytics Dashboard
-
-📚 Learning Outcomes
-
-Practical implementation of Django framework
-
-Database design & relationships
-
-User authentication system
-
-Full-stack web development experience
-
-🙋‍♀️ Author
-
-Dhrumi Shah
-
-🎓 M.Sc IT Student
-
-💻 Passionate about Web Development & Data Analysis
+Dhrumi Shah    
+Passionate about Web Development & Data Analysis  
